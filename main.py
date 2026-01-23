@@ -23,14 +23,13 @@ TW_JOBS = {
 ## Main ----
 
 def main(
-    salesforce, 
-    tw_job_name, 
-    survey_language = Language.english, 
-    cc_survey_xmlns = 'http://openrosa.org/formdesigner/TEST_XMLNS',
-    dirname = '.'
-):
+    salesforce: Salesforce,
+    tw_job_name: str,
+    survey_language: Language = Language.english,
+    cc_survey_xmlns: str = 'http://openrosa.org/formdesigner/TEST_XMLNS',
+    dirname: str = '.'
+) -> None:
     
-    # Migrate survey
     tw_job = query_tw_job(salesforce, tw_job_name)
 
     form_name = tw_job['gfsurveys__Form__r']['gfsurveys__Survey__r']['Name']
@@ -41,10 +40,10 @@ def main(
     tw_form = query_tw_form(salesforce, form_name, form_version)
 
     migrated_survey = migrate_survey(
-        tw_form, 
-        pulldown_mappings, 
-        tw_job_name, 
-        cc_survey_xmlns, 
+        tw_form,
+        pulldown_mappings,
+        tw_job_name,
+        cc_survey_xmlns,
         survey_language,
     )
 
@@ -74,12 +73,12 @@ if __name__ == "__main__":
         salesforce = Salesforce(
             username = os.getenv('SALESFORCE_USERNAME'),
             privatekey_file = os.getenv('SALESFORCE_PRIVATEKEY_FILE'),
-            consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY')
+            consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY'),
         ) # reload sf for each job in case connection times out
 
         main(
-            salesforce, 
-            job_name, 
+            salesforce,
+            job_name,
             language,
             dirname = dirname
         )

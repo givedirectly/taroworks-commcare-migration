@@ -1,7 +1,7 @@
-from simple_salesforce import format_soql
+from simple_salesforce import format_soql, Salesforce
 
 
-def query_tw_job(salesforce, job_name):
+def query_tw_job(salesforce: Salesforce, job_name: str) -> dict:
     query = salesforce.query_all(
         format_soql(
             '''
@@ -20,7 +20,7 @@ def query_tw_job(salesforce, job_name):
     )
     return query['records'][0]
 
-def query_tw_form(salesforce, form_name, form_version):
+def query_tw_form(salesforce: Salesforce, form_name: str, form_version: int) -> list[dict]:
     query_results = salesforce.query_all(
         format_soql(
             """

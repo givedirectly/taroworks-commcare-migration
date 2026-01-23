@@ -33,7 +33,7 @@ TW_QUESTION_TYPES = {
 
 ## Migration function ----
 
-def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey_language):
+def migrate_survey(tw_form: dict, pulldown_mappings: dict[str, str], survey_name: str, survey_xmlns: str, survey_language: Language) -> Survey:
 
     groups_by_index = {}
     groups_by_id, questions_by_id, options_by_id = {}, {}, {}
@@ -121,7 +121,7 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
 
 ## Helpers ----
 
-def _clean_section_question(section_question):
+def _clean_section_question(section_question: str) -> tuple[int, int]:
     section, question = tuple(int(n) for n in section_question.split('-'))
     if section == 0:
         section, question = question, section
@@ -130,7 +130,7 @@ def _clean_section_question(section_question):
 
 ## Question metadata ----
 
-def get_question_type(question, pulldown_mappings, questions_by_id):
+def get_question_type(question: dict, pulldown_mappings: dict[str, str], questions_by_id: dict[str, dict]) -> QuestionType:
 
     if question['Name'] in pulldown_mappings:
         return QuestionType.calculation
@@ -151,7 +151,7 @@ def get_question_type(question, pulldown_mappings, questions_by_id):
         raise ValueError(f"Missing CC type conversion for TW type: {question['gfsurveys__Type__c']}")
 
 
-def get_question_comment(question, questions_by_id, question_type):
+def get_question_comment(question: dict, questions_by_id: dict[str, dict], question_type: QuestionType) -> str:
 
     comment = ''
 
@@ -178,7 +178,7 @@ def get_question_comment(question, questions_by_id, question_type):
     return comment
 
 
-def _get_mappings(question) -> list[str]:
+def _get_mappings(question: dict) -> list[str]:
 
     if not question['gfsurveys__QuestionMappings__r']:
         return []
@@ -191,7 +191,7 @@ def _get_mappings(question) -> list[str]:
     return mappings
 
 
-def get_question_options(question, survey_language) -> dict[Option]:
+def get_question_options(question: dict, survey_language: Language) -> dict[str, Option]:
 
     if not question['gfsurveys__Options__r']:
         return {}
@@ -206,14 +206,14 @@ def get_question_options(question, survey_language) -> dict[Option]:
 
     return options
 
-def _get_option_api_name(option_caption):
+def _get_option_api_name(option_caption: str) -> str:
     api_name = re.sub(r'\W+', '_', option_caption)
     api_name = api_name.lower()
     api_name = api_name[:min(len(api_name), 75)]
     return api_name
 
 
-def get_question_show_logic(question, question_type, all_questions, all_options, survey_language):
+def get_question_show_logic(question: dict, question_type: QuestionType, questions_by_id: dict[str, dict], options_by_id: dict[str, Option], survey_language: Language) -> ShowLogic | None:
     
     if question['gfsurveys__Hidden__c']:
         if question_type == QuestionType.calculation:
@@ -228,7 +228,7 @@ def get_question_show_logic(question, question_type, all_questions, all_options,
     for skip_condition in question['gfsurveys__SkipConditions__r']['records']:
         
         try:
-            referenced_question = all_questions[skip_condition['gfsurveys__SourceQuestion__c']]
+            referenced_question = questions_by_id[skip_condition['gfsurveys__SourceQuestion__c']]
         
         except:
             raise ValueError(f"Unable to find question with ID {skip_condition['gfsurveys__SourceQuestion__c']} referenced in show logic of question with ID {question['Id']}")
@@ -245,7 +245,7 @@ def get_question_show_logic(question, question_type, all_questions, all_options,
                 # SkipValue is an option ID
                 referenced_option_id = skip_condition['gfsurveys__SkipValue__c']
                 try:
-                    referenced_option = all_options[referenced_option_id]
+                    referenced_option = options_by_id[referenced_option_id]
                 except KeyError:
                     if question['gfsurveys__SkipLogicOperator__c'] == 'All':
                         raise ValueError(f"Unable to find option with ID {skip_condition['gfsurveys__SkipValue__c']} referenced in show logic of question with ID {question['Id']}")
@@ -286,7 +286,7 @@ def get_question_show_logic(question, question_type, all_questions, all_options,
     )
 
 
-def get_question_calculation(question, pulldown_mappings, questions_by_id):
+def get_question_calculation(question: dict, pulldown_mappings: dict[str, str], questions_by_id: dict[str, dict]) -> Calculation | None:
 
     if question['Name'] in pulldown_mappings:
         case_property = pulldown_mappings[question['Name']].replace('.', '__')
@@ -305,7 +305,7 @@ def get_question_calculation(question, pulldown_mappings, questions_by_id):
     return Calculation(translated_calculation)
 
 
-def get_question_validation(question, questions_by_id, question_type, survey_language):
+def get_question_validation(question: dict, questions_by_id: dict[str, dict], question_type: str, survey_language: Language) -> Validation | None:
 
     # Translate response validation (regex)
     if question['gfsurveys__ResponseValidation__c']:
@@ -345,7 +345,7 @@ def get_question_validation(question, questions_by_id, question_type, survey_lan
 
 ## Pulldowns ----
 
-def get_pulldown_mappings(tw_job):
+def get_pulldown_mappings(tw_job: dict) -> dict[str, str]:
     
     hierarchy = json.loads(tw_job['gfsurveys__JobTemplate__r']['gfsurveys__Hierarchy__c'])
     mappings = json.loads(tw_job['gfsurveys__Mapping__c'])
@@ -359,7 +359,7 @@ def get_pulldown_mappings(tw_job):
 
     return pulldown_mappings
 
-def _flatten_list(x):
+def _flatten_list(x) -> list:
     if not isinstance(x, list):
         return [x]
     ret = []

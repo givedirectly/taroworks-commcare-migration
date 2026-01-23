@@ -1,12 +1,16 @@
-import esprima, re
+import re
 from html import unescape
 
-from migration.xforms.classes import Language, QuestionType
+import esprima
+from esprima.syntax import Syntax
+from esprima.nodes import Node
+
+from migration.xforms.classes import Language, QuestionType, Question
 
 
 ## Calculations ----
 
-def translate_calculation(formula, question_name, other_questions):
+def translate_calculation(formula: str, question_name: str, other_questions: list[Question]) -> str:
     
     parsed_formula = esprima.parseScript(unescape(formula))
     
@@ -15,7 +19,7 @@ def translate_calculation(formula, question_name, other_questions):
     
     return _translate_node(parsed_formula, question_name, other_questions)
 
-def _translate_node(node, question_name, questions):
+def _translate_node(node: Node, question_name: str, questions: list[Question]) -> str:
     
     if node.type in translation_functions:
         translation_function = translation_functions[node.type]
@@ -23,9 +27,9 @@ def _translate_node(node, question_name, questions):
     
     raise NotImplementedError()
 
-def _has_throw_statement(node):
+def _has_throw_statement(node: Node) -> bool:
     
-    if node.type == "ThrowStatement":
+    if node.type == Syntax.ThrowStatement:
         return True
     
     result = False
@@ -44,7 +48,7 @@ def _has_throw_statement(node):
 
 ## Validations ----
 
-def translate_validation(formula, question_name, other_questions):
+def translate_validation(formula: str, question_name: str, other_questions: list[Question]) -> tuple[str, str]:
     
     parsed_formula = esprima.parseScript(unescape(formula))
     conditions, messages = _translate_validation_node(parsed_formula, question_name, other_questions)
@@ -58,17 +62,17 @@ def translate_validation(formula, question_name, other_questions):
 
     return condition, message
 
-def _translate_validation_node(node, question_name, questions):
+def _translate_validation_node(node: Node, question_name: str, questions: list[Question]) -> tuple[list[str], list[str]]:
     
     conditions, messages = [], []
 
-    if node.type in ("BlockStatement", "Program"):
+    if node.type in (Syntax.BlockStatement, Syntax.Program):
         if len(node.body) == 1:
             return _translate_validation_node(node.body[0], question_name, questions)
         else:
             raise NotImplementedError
     
-    if node.type == "IfStatement":
+    if node.type == Syntax.IfStatement:
 
         conditions.append(_translate_node(node.test, question_name, questions))
         
@@ -81,7 +85,7 @@ def _translate_validation_node(node, question_name, questions):
             conditions.extend(alternate_conditions)
             messages.extend(alternate_messages)
         
-    if node.type == "ThrowStatement":
+    if node.type == Syntax.ThrowStatement:
         messages.append(node.argument.value)
     
     return conditions, messages
@@ -124,7 +128,7 @@ call_expression_function_translations = {
 
 ## Functions ----
 
-def _translate_binary_expression(node, question_name, questions):
+def _translate_binary_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """Anything structured as `{left_value} {operator} {right_value}`, such as: `3 + 4` or `tw.section.question.value == 'value'`"""
 
     translated_left = _translate_node(node.left, question_name, questions)
@@ -161,14 +165,14 @@ def _translate_binary_expression(node, question_name, questions):
     
     raise NotImplementedError()
 
-def _comparison_with_null(object, operator):
+def _comparison_with_null(object: str, operator: str) -> str:
     if operator == "!=":
         return f"boolean({object})"
     if operator == "=":
         return f"not({object})"
     raise NotImplementedError()
 
-def _is_comparison_with_picklist(potential_question, potential_option_node, question_name, questions):
+def _is_comparison_with_picklist(potential_question: str, potential_option_node: str, question_name: str, questions: list[Question]) -> bool:
 
     question_name_match = re.match(r'#form/survey/\w+/(\w+)$', potential_question)
     if not question_name_match and potential_question != ".":
@@ -179,17 +183,17 @@ def _is_comparison_with_picklist(potential_question, potential_option_node, ques
     if not other_question or other_question.type not in (QuestionType.single_select, QuestionType.multi_select):
         return False
     
-    if potential_option_node.type != "Literal":
+    if potential_option_node.type != Syntax.Literal:
         return False
 
     return True
 
-def _get_question_by_name(question_name, questions):
+def _get_question_by_name(question_name: str, questions: list[Question]) -> Question:
     for question in questions:
         if question.name == question_name:
             return question
 
-def _comparison_with_picklist(question, operator, value_node, question_name, questions):
+def _comparison_with_picklist(question: str, operator: str, value_node: Node, question_name: str, questions: list[Question]):
     
     if operator in ("!=", "="):
 
@@ -215,7 +219,7 @@ def _comparison_with_picklist(question, operator, value_node, question_name, que
     
     raise NotImplementedError()
 
-def _is_string(object, questions):
+def _is_string(object: str, questions: list[Question]) -> bool:
     if re.match(r"^'.+'$", object) or re.match(r'^".+"$', object):
         return True
     question_name_match = re.match(r'#form/survey/\w+/(\w+)$', object)
@@ -227,7 +231,7 @@ def _is_string(object, questions):
     return False
                         
 
-def _translate_block_statement(node, question_name, questions):
+def _translate_block_statement(node: Node, question_name: str, questions: list[Question]) -> str:
     """
     Any number of lines of code inside braces, such as in an if-statement or for-loop:
     if (3 == 4) {
@@ -243,10 +247,10 @@ def _translate_block_statement(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_call_expression(node, question_name, questions):
+def _translate_call_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """A function call, such as `'string'.startsWith('substring')`"""
     
-    if node.callee.type == "MemberExpression":
+    if node.callee.type == Syntax.MemberExpression:
         
         translated_property = _translate_node(node.callee.property, question_name, questions)
         
@@ -257,7 +261,7 @@ def _translate_call_expression(node, question_name, questions):
             return translated_function.format(translated_object, *translated_arguments)
         
         if translated_property == 'test': # indicates a regex test in taroworks
-            if node.callee.object.type == 'Literal' and node.callee.object.regex:
+            if node.callee.object.type == Syntax.Literal and node.callee.object.regex:
                 translated_object = _translate_node(node.callee.object, question_name, questions)
                 if len(node.arguments) > 1:
                     raise NotImplementedError()
@@ -267,20 +271,20 @@ def _translate_call_expression(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_conditional_expression(node, question_name, questions):
+def _translate_conditional_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """A one-line conditional expression, such as `var x = (3 < 4) ? 'value1' : 'value2'`"""
     return _translate_if_statement(node, question_name, questions)
 
 
-def _translate_expression_statement(node, question_name, questions):
+def _translate_expression_statement(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression that sets or returns a value, such as `var value = 3` or simply `3`"""
 
-    if node.expression.type == "AssignmentExpression":
+    if node.expression.type == Syntax.AssignmentExpression:
         return _translate_assignment_expression(node.expression, question_name, questions)
     
     raise NotImplementedError()
 
-def _translate_assignment_expression(node, question_name, questions):
+def _translate_assignment_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression that sets a variable's value, such as `tw.section.question.value = 3`"""
 
     if node.operator == "=":
@@ -291,12 +295,12 @@ def _translate_assignment_expression(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_identifier(node, question_name, questions):
+def _translate_identifier(node: Node, question_name: str, questions: list[Question]) -> str:
     """Any reference to a named object. For example, in `tw.section.question.hasAnswer`, there are four identifiers: `tw`, `section`, `question` and `hasAnswer`"""
     return node.name
 
 
-def _translate_if_statement(node, question_name, questions):
+def _translate_if_statement(node: Node, question_name: str, questions: list[Question]) -> str:
     """An if or if-else block, such as `if (3 == 4) { expression } else {expression}"""
 
     translated_test = _translate_node(node.test, question_name, questions)
@@ -309,7 +313,7 @@ def _translate_if_statement(node, question_name, questions):
     return f"if({translated_test}, {translated_consequent}, '')"
 
 
-def _translate_literal(node, question_name, questions):
+def _translate_literal(node: Node, question_name: str, questions: list[Question]) -> str:
     r"""A directly-referenced value, such as `true`, `"hello"`, `3` or `/^\w+/` (a regex)"""
 
     if node.regex:
@@ -331,7 +335,7 @@ def _translate_literal(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_logical_expression(node, question_name, questions):
+def _translate_logical_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An `and` or `or` expression, such as `(3 == 4) && (1 < 2)"""
     
     translated_left = _translate_node(node.left, question_name, questions)
@@ -346,7 +350,7 @@ def _translate_logical_expression(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_member_expression(node, question_name, questions):
+def _translate_member_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression that retrieves a member of an object, denoted by `.` in javascript, such as `"string".length`"""
     
     translated_object = _translate_node(node.object, question_name, questions)
@@ -383,10 +387,10 @@ def _translate_member_expression(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_new_expression(node, question_name, questions):
+def _translate_new_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression such as `new Date()`"""
     
-    if node.callee.type == "Identifier" and node.callee.name == "Date":
+    if node.callee.type == Syntax.Identifier and node.callee.name == Syntax.Date:
         
         if len(node.arguments) > 1:
             raise NotImplementedError()
@@ -400,14 +404,14 @@ def _translate_new_expression(node, question_name, questions):
     raise NotImplementedError()
 
 
-def _translate_program(node, question_name, questions):
+def _translate_program(node: Node, question_name: str, questions: list[Question]) -> str:
     """A whole script of javascript"""
     if node.sourceType == 'script' and len(node.body) == 1:
         return _translate_node(node.body[0], question_name, questions)
     raise NotImplementedError()
 
 
-def _translate_unary_expression(node, question_name, questions):
+def _translate_unary_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression that modifies a varible or value such as `-3` (modifies 3) or `!(3 == 2)` (modifies (3==2))"""
 
     translated_argument = _translate_node(node.argument, question_name, questions)
@@ -424,17 +428,17 @@ def _translate_unary_expression(node, question_name, questions):
 ## List ----
 
 translation_functions = {
-    "BinaryExpression": _translate_binary_expression,
-    "BlockStatement": _translate_block_statement,
-    "CallExpression": _translate_call_expression,
-    "ConditionalExpression": _translate_conditional_expression,
-    "ExpressionStatement": _translate_expression_statement,
-    "Identifier": _translate_identifier,
-    "IfStatement": _translate_if_statement,
-    "Literal": _translate_literal,
-    "LogicalExpression": _translate_logical_expression,
-    "MemberExpression": _translate_member_expression,
-    "NewExpression": _translate_new_expression,
-    "Program": _translate_program,
-    "UnaryExpression": _translate_unary_expression,
+    Syntax.BinaryExpression: _translate_binary_expression,
+    Syntax.BlockStatement: _translate_block_statement,
+    Syntax.CallExpression: _translate_call_expression,
+    Syntax.ConditionalExpression: _translate_conditional_expression,
+    Syntax.ExpressionStatement: _translate_expression_statement,
+    Syntax.Identifier: _translate_identifier,
+    Syntax.IfStatement: _translate_if_statement,
+    Syntax.Literal: _translate_literal,
+    Syntax.LogicalExpression: _translate_logical_expression,
+    Syntax.MemberExpression: _translate_member_expression,
+    Syntax.NewExpression: _translate_new_expression,
+    Syntax.Program: _translate_program,
+    Syntax.UnaryExpression: _translate_unary_expression,
 }
