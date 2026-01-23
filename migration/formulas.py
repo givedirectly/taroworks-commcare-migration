@@ -116,8 +116,8 @@ call_expression_function_translations = {
     'toLowerCase': 'lower-case({})',
     'includes': 'selected({}, {})',
     'contains': 'selected({}, {})', 
-        # ^ nuance above: translation is technically ambiguous bc in formulas that reference multi-select questions, 
-        # we should translate to `selected` and in formulas that reference js lists, `contains`. but since the translation
+        # ^ nuance above: translation for `contains` is ambiguous. we should translate to `selected` in formulas that reference
+        # multi-select questions and to `selected` and in formulas that reference javascript lists. however, as the translation
         # will fail for formulas with js lists anyway, I am only handling the first case.
 }
 
@@ -256,7 +256,7 @@ def _translate_call_expression(node, question_name, questions):
             translated_function = call_expression_function_translations[translated_property]
             return translated_function.format(translated_object, *translated_arguments)
         
-        if translated_property == 'test': # regex test
+        if translated_property == 'test': # indicates a regex test in taroworks
             if node.callee.object.type == 'Literal' and node.callee.object.regex:
                 translated_object = _translate_node(node.callee.object, question_name, questions)
                 if len(node.arguments) > 1:
@@ -285,7 +285,7 @@ def _translate_assignment_expression(node, question_name, questions):
 
     if node.operator == "=":
         translated_left = _translate_node(node.left, question_name, questions)
-        if translated_left == ".": #translated_left.split('/')[-1] == question_name:
+        if translated_left == ".":
             return _translate_node(node.right, question_name, questions)
     
     raise NotImplementedError()
@@ -366,7 +366,7 @@ def _translate_member_expression(node, question_name, questions):
     question_match = re.match(r"#form/survey/\w+/(\w+)$", translated_object)
     if question_match:
 
-        if translated_property in ("value", "valu", "hasAnswer"): # "valu" for confirmed typos
+        if translated_property in ("value", "hasAnswer"):
         
             if question_match.group(1) == question_name:
                 translated_object = "."
