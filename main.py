@@ -1,4 +1,5 @@
-import os, re
+import argparse
+import os
 from dotenv import load_dotenv
 from simple_salesforce import Salesforce
 
@@ -12,21 +13,13 @@ from migration.migration import (
 )
 
 
-MASTER_DIRNAME = 'dirname'
-
-TW_JOBS = {
-    'tw_job_name': Language.language_code,
-    ...: ...,
-}
-
-
 ## Main ----
 
 def main(
     salesforce: Salesforce,
     tw_job_name: str,
     survey_language: Language = Language.english,
-    cc_survey_xmlns: str = 'http://openrosa.org/formdesigner/TEST_XMLNS',
+    survey_xmlns: str = 'http://openrosa.org/formdesigner/TEST_XMLNS',
     dirname: str = '.'
 ) -> None:
     
@@ -43,7 +36,7 @@ def main(
         tw_form,
         pulldown_mappings,
         tw_job_name,
-        cc_survey_xmlns,
+        survey_xmlns,
         survey_language,
     )
 
@@ -57,28 +50,32 @@ def main(
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(
+        description = (
+            "Migrates a taroworks survey to commcare (queries TW survey data and "
+            "outputs a commcare survey xform and a list of case properties needed)."
+        )
+    )
+
+    parser.add_argument("--tw_job")
+    parser.add_argument("--survey_language", default="english")
+    parser.add_argument("--directory", default=".")
+    
+    args = parser.parse_args()
+
     load_dotenv()
 
-    for job_name, language in TW_JOBS.items():
+    salesforce = Salesforce(
+        username = os.getenv('SALESFORCE_USERNAME'),
+        privatekey_file = os.getenv('SALESFORCE_PRIVATEKEY_FILE'),
+        consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY'),
+    )
 
-        print(f'\n\n----\n\nMigrating job {job_name} ({language})')
+    os.makedirs(args.directory)
 
-        dirname = MASTER_DIRNAME + '/' + re.sub(r'\s+', ' ', re.sub(r'\W', ' ', job_name))
-
-        try:
-            os.mkdir(dirname)
-        except FileExistsError:
-            pass
-
-        salesforce = Salesforce(
-            username = os.getenv('SALESFORCE_USERNAME'),
-            privatekey_file = os.getenv('SALESFORCE_PRIVATEKEY_FILE'),
-            consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY'),
-        ) # reload sf for each job in case connection times out
-
-        main(
-            salesforce,
-            job_name,
-            language,
-            dirname = dirname
-        )
+    main(
+        salesforce,
+        args.job_name,
+        args.language,
+        dirname = args.dirname
+    )
