@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:orx="http://openrosa.org/jr/xforms" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:vellum="http://commcarehq.org/xforms/vellum">
+	<h:head>
+		<h:title>Survey</h:title>
+		<model>
+			<instance>
+				<data xmlns:jrm="http://dev.commcarehq.org/jr/xforms" xmlns="http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0" uiVersion="1" version="1" name="Survey">
+					<group>
+						<text />
+					</group>
+				</data>
+			</instance>
+			<bind vellum:nodeset="#form/group" nodeset="/data/group" />
+			<bind vellum:nodeset="#form/group/text" nodeset="/data/group/text" type="xsd:string" />
+			<itext>
+				<translation lang="en" default="">
+					<text id="group-label">
+						<value>group</value>
+					</text>
+					<text id="group/text-label">
+						<value>text</value>
+					</text>
+				</translation>
+				<translation lang="art">
+					<text id="group-label">
+						<value>group</value>
+					</text>
+					<text id="group/text-label">
+						<value>text</value>
+					</text>
+				</translation>
+			</itext>
+		</model>
+	</h:head>
+	<h:body>
+		<group vellum:ref="#form/group" ref="/data/group">
+			<label ref="jr:itext('group-label')" />
+			<input vellum:ref="#form/group/text" ref="/data/group/text">
+				<label ref="jr:itext('group/text-label')" />
+			</input>
+		</group>
+	</h:body>
+</h:html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:orx="http://openrosa.org/jr/xforms" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:vellum="http://commcarehq.org/xforms/vellum">
+	<h:head>
+		<h:title>Survey</h:title>
+		<model>
+			<instance>
+				<data xmlns:jrm="http://dev.commcarehq.org/jr/xforms" xmlns="http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0" uiVersion="1" version="1" name="Survey">
+					<integer />
+					<repeat_group jr:template="">
+						<text />
+					</repeat_group>
+				</data>
+			</instance>
+			<bind vellum:nodeset="#form/integer" nodeset="/data/integer" type="xsd:int" />
+			<bind vellum:nodeset="#form/repeat_group" nodeset="/data/repeat_group" />
+			<bind vellum:nodeset="#form/repeat_group/text" nodeset="/data/repeat_group/text" type="xsd:string" />
+			<itext>
+				<translation lang="en" default="">
+					<text id="integer-label">
+						<value>integer</value>
+					</text>
+					<text id="repeat_group-label">
+						<value>repeat group</value>
+					</text>
+					<text id="repeat_group/text-label">
+						<value>text</value>
+					</text>
+				</translation>
+				<translation lang="art">
+					<text id="integer-label">
+						<value>integer</value>
+					</text>
+					<text id="repeat_group-label">
+						<value>repeat group</value>
+					</text>
+					<text id="repeat_group/text-label">
+						<value>text</value>
+					</text>
+				</translation>
+			</itext>
+		</model>
+	</h:head>
+	<h:body>
+		<input vellum:ref="#form/integer" ref="/data/integer">
+			<label ref="jr:itext('integer-label')" />
+		</input>
+		<group>
+			<label ref="jr:itext('repeat_group-label')" />
+			<repeat vellum:jr__count="#form/integer" jr:count="/data/integer" jr:noAddRemove="true()" vellum:nodeset="#form/repeat_group" nodeset="/data/repeat_group">
+				<input vellum:ref="#form/repeat_group/text" ref="/data/repeat_group/text">
+					<label ref="jr:itext('repeat_group/text-label')" />
+				</input>
+			</repeat>
+		</group>
+	</h:body>
+</h:html>
