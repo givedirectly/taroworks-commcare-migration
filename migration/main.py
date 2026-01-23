@@ -4,7 +4,6 @@ from simple_salesforce import Salesforce
 
 from gddata import get_picklist_translations 
 
-from commcare.field_mappings.generate_mappings import get_mapping_file_text
 from commcare.xforms.classes import Language
 
 from commcare.migration.surveys import (
@@ -13,7 +12,6 @@ from commcare.migration.surveys import (
     get_pulldown_mappings,
     migrate_survey
 )
-from commcare.migration.field_mappings import get_mappings
 
 
 MASTER_DIRNAME = '/Users/gavarela/Google Drive/Meu Drive/GD Downloads/reusable_library/migration'
@@ -135,22 +133,6 @@ def main(
     case_properties = [field.replace('.', '__') for field in pulldown_mappings.values()]
     with open(f'{dirname}/case_properties.txt', 'w') as file:
         file.write('\n'.join(case_properties))
-    
-    # Migrate mappings
-    print('Creating a mapping python file.')
-
-    mappings = get_mappings(
-        salesforce, 
-        form_name, 
-        form_version,
-        groups = groups, 
-        questions = questions
-    )
-
-    mapping_file_text = get_mapping_file_text(mappings, cc_survey_xmlns)
-
-    with open(f'{dirname}/migrated_mappings.py', 'w') as file:
-        file.write(mapping_file_text)
 
     print('All done')
 
