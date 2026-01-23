@@ -33,7 +33,7 @@ TW_QUESTION_TYPES = {
 
 ## Migration function ----
 
-def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey_language, picklist_translations):
+def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey_language):
 
     groups_by_index = {}
     groups_by_id, questions_by_id, options_by_id = {}, {}, {}
@@ -47,7 +47,7 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
             # Make section
             group = Group(
                 name = record['Name'],
-                label = {language: record['gfsurveys__Caption__c'] for language in (survey_language, Language.artificial)},
+                label = {survey_language: record['gfsurveys__Caption__c']},
                 contents = [],
                 repeat = questions_by_id[record['gfsurveys__RepeatSourceValue__c']] if record['gfsurveys__RepeatSourceValue__c'] else None,
                 show_logic = get_question_show_logic(record, 'group', questions_by_id, options_by_id, survey_language)
@@ -61,7 +61,7 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
         else:
             
             # Make options
-            options = get_question_options(record, picklist_translations, survey_language)
+            options = get_question_options(record, survey_language)
             options_by_id.update(options)
             
             # Make question
@@ -70,15 +70,9 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
             question = Question(
                 name = record['Name'],
                 type = question_type,
-                label = {
-                    language: record['gfsurveys__Caption__c'] 
-                    for language in (survey_language, Language.artificial)
-                },
+                label = {survey_language: record['gfsurveys__Caption__c']},
                 comment = get_question_comment(record, questions_by_id, question_type),
-                hint = {
-                    language: record['gfsurveys__Hint__c'] or '' 
-                    for language in (survey_language, Language.artificial)
-                }, # not needed for calculated questions but is discarded once xform is uploaded
+                hint = {survey_language: record['gfsurveys__Hint__c'] or ''}, # not needed for calculated questions but is discarded once xform is uploaded
                 required = record['gfsurveys__Required__c'] if question_type != QuestionType.calculation else None,
                 show_logic = get_question_show_logic(record, question_type, questions_by_id, options_by_id, survey_language),
                 validation = get_question_validation(record, questions_by_id, question_type, survey_language),
@@ -96,15 +90,9 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
                 label_question = Question(
                     name = f"label_{record['Name']}",
                     type = QuestionType.label,
-                    label = {
-                        language: f"{record['gfsurveys__Caption__c']}\n\n{{}}"
-                        for language in (survey_language, Language.artificial)
-                    },
+                    label = {survey_language: f"{record['gfsurveys__Caption__c']}\n\n{{}}"},
                     references = [question],
-                    hint = {
-                        language: record['gfsurveys__Hint__c'] or '' 
-                        for language in (survey_language, Language.artificial)
-                    },
+                    hint = {survey_language: record['gfsurveys__Hint__c'] or ''},
                     required = None if question_type == QuestionType.calculation else record['gfsurveys__Required__c'],
                     show_logic = get_question_show_logic(record, question_type, questions_by_id, options_by_id, survey_language),
                 )
@@ -114,7 +102,7 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
     # Set up survey
     root_group = Group(
         name = 'survey',
-        label = {language: 'Survey' for language in (survey_language, Language.artificial)},
+        label = {survey_language: 'Survey'},
         contents = list(groups_by_id.values()),
     )
 
@@ -122,13 +110,13 @@ def migrate_survey(tw_form, pulldown_mappings, survey_name, survey_xmlns, survey
         title = survey_name,
         xmlns = survey_xmlns,
         contents = [root_group],
-        languages = [survey_language, Language.artificial],
+        languages = [survey_language],
         version = None
     )
 
     survey.__post_init__() # unclear why i need to force-run this but it fixes issues with show logic
 
-    return survey, (groups_by_id, questions_by_id)
+    return survey
 
 
 ## Helpers ----
@@ -203,25 +191,17 @@ def _get_mappings(question) -> list[str]:
     return mappings
 
 
-def get_question_options(question, picklist_translations, survey_language) -> dict[Option]:
+def get_question_options(question, survey_language) -> dict[Option]:
 
     if not question['gfsurveys__Options__r']:
         return {}
-    
-    if question['gfsurveys__QuestionMappings__r']:
-        mapping = _get_mappings(question)[0]
-    else:
-        mapping = None
 
     options = {}
     for option in question['gfsurveys__Options__r']['records']:
         caption = unquote(option['gfsurveys__Caption__c'])
         options[option['Id']] = Option(
             name = _get_option_api_name(caption),
-            label = {
-                survey_language: caption,
-                Language.artificial: _get_art_translation(caption, mapping, survey_language, picklist_translations)
-            }
+            label = {survey_language: caption},
         )
 
     return options
@@ -231,18 +211,6 @@ def _get_option_api_name(option_caption):
     api_name = api_name.lower()
     api_name = api_name[:min(len(api_name), 75)]
     return api_name
-
-def _get_art_translation(translated_value, mapped_field, survey_language, picklist_translations):
-
-    if survey_language == Language.english or not mapped_field:
-        return translated_value
-    
-    if mapped_field in picklist_translations:
-        for english_value, translation in picklist_translations[mapped_field].items():
-            if translation == translated_value:
-                return english_value
-            
-    return translated_value
 
 
 def get_question_show_logic(question, question_type, all_questions, all_options, survey_language):
@@ -344,7 +312,7 @@ def get_question_validation(question, questions_by_id, question_type, survey_lan
         regex = re.sub(r'(^/|/$)', '', question['gfsurveys__ResponseValidation__c'])
         regex = regex.replace('{', '{{').replace('}', '}}') # to 'escape' the braces since the Validation class will try to format the validation string
         return Validation(
-            message = {language: 'Your answer has an invalid format.' for language in (survey_language, Language.artificial)},
+            message = {survey_language: 'Your answer has an invalid format.'},
             validation = f"regex(., '{regex}')"
         )
     
@@ -365,12 +333,12 @@ def get_question_validation(question, questions_by_id, question_type, survey_lan
         translated_validation, validation_message = translate_validation(question['gfsurveys__DynamicOperation__c'], question['Name'], list(questions_by_id.values()))
     except NotImplementedError:
         return Validation(
-            message = {language: '...' for language in (survey_language, Language.artificial)},
+            message = {survey_language: '...'},
             validation = FAKE_FORMULA
         )
     else:
         return Validation(
-            message = {language: validation_message for language in (survey_language, Language.artificial)},
+            message = {survey_language: validation_message},
             validation = translated_validation
         )
 

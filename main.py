@@ -2,8 +2,6 @@ import json, os, pickle, re
 from dotenv import load_dotenv
 from simple_salesforce import Salesforce
 
-from gddata import get_picklist_translations 
-
 from migration.xforms.classes import Language
 
 from migration.migration import (
@@ -47,17 +45,6 @@ TW_JOBS = {
 }
 
 
-## Constants ---- (do not touch!)
-
-sf_language_codes = {
-    Language.english: None,
-    Language.portuguese: 'pt_BR',
-    Language.french: 'fr',
-    Language.kinyarwanda: 'fi',
-    Language.arabic: 'ar_YE'
-}
-
-
 ## Main ----
 
 def main(
@@ -86,42 +73,14 @@ def main(
         with open(f'{dirname}/tw_form.json', 'w') as file:
             json.dump(tw_form, file, indent = 4)
 
-    sf_language_code = sf_language_codes[survey_language]
-    if sf_language_code:
-
-        print(f'Pulling all picklist translations from {sf_language_code}. This may take a few minutes.')
-
-        mapped_objects = set()
-        for question in tw_form:
-            if question['gfsurveys__QuestionMappings__r']:
-                for mapping in question['gfsurveys__QuestionMappings__r']['records']:
-                    mapped_objects.add(mapping['Object_mapping__c'])
-
-        try:
-            with open(f'{dirname}/../picklist_translations__{sf_language_code}.json', 'r') as file:
-                picklist_translations = json.load(file)
-        except FileNotFoundError:
-            picklist_translations = get_picklist_translations(
-                salesforce,
-                sobjects = mapped_objects,
-                language_code = sf_language_code
-            )
-            with open(f'{dirname}/../picklist_translations__{sf_language_code}.json', 'w') as file:
-                json.dump(picklist_translations, file, indent = 4)
-
-    else:
-
-        picklist_translations = None
-
     print('Converting TW form into xform.')
 
-    migrated_survey, (groups, questions) = migrate_survey(
+    migrated_survey = migrate_survey(
         tw_form, 
         pulldown_mappings, 
         tw_job_name, 
         cc_survey_xmlns, 
-        survey_language, 
-        picklist_translations
+        survey_language,
     )
 
     with open(f'{dirname}/survey_class.pkl', 'wb') as file:
