@@ -5,7 +5,7 @@ import esprima
 from esprima.syntax import Syntax
 from esprima.nodes import Node
 
-from migration.xforms.classes import Language, QuestionType, Question
+from migration.xforms.classes import QuestionType, Question
 
 
 ## Calculations ----
@@ -390,7 +390,7 @@ def _translate_member_expression(node: Node, question_name: str, questions: list
 def _translate_new_expression(node: Node, question_name: str, questions: list[Question]) -> str:
     """An expression such as `new Date()`"""
     
-    if node.callee.type == Syntax.Identifier and node.callee.name == Syntax.Date:
+    if node.callee.type == Syntax.Identifier and node.callee.name == "Date":
         
         if len(node.arguments) > 1:
             raise NotImplementedError()

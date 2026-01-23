@@ -266,8 +266,7 @@ class Language(StrEnum):
     lui = "lui" # Luiseno
     lun = "lun" # Lunda
     luo = "luo" # Luo (Kenya and Tanzania)
-    lus = "lus" # Mizo
-    lus = "lus" # Lushai
+    lus = "lus" # Mizo / Lushai
     mkd = "mkd" # Macedonian
     mad = "mad" # Madurese
     mag = "mag" # Magahi
@@ -355,7 +354,6 @@ class Language(StrEnum):
     por = "por" # Portuguese
     pra = "pra" # Prakrit languages
     pus = "pus" # Pushto
-    qaa-qtz = "qtz" # Reserved for local use
     que = "que" # Quechua
     raj = "raj" # Rajasthani
     rap = "rap" # Rapanui
