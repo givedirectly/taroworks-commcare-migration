@@ -18,7 +18,7 @@ from migration.migration import (
 def main(
     salesforce: Salesforce,
     tw_job_name: str,
-    survey_language: Language = Language.english,
+    survey_language: Language = Language.en,
     survey_xmlns: str = 'http://openrosa.org/formdesigner/TEST_XMLNS',
     dirname: str = '.'
 ) -> None:
