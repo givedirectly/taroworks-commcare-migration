@@ -15,11 +15,6 @@
 						<value>signature</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="signature-label">
-						<value>signature</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

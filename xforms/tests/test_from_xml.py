@@ -1,23 +1,22 @@
 import pytest
 import xml.etree.ElementTree as ET
 
+from migration.xforms import Language
 from migration.xforms.classes import (
     Calculation,
     Group,
-    Language,
-    QuestionType,
-    Question,
-    Language,
     Option,
-    Survey,
+    Question,
+    QuestionType,
     ShowLogic,
+    Survey,
     Validation
 )
 
 from migration.xforms import build_survey_from_xform
 
 EXPECTATIONS_DIR = 'migration/xforms/tests/expectations/'
-LANGUAGES = {Language.english, Language.artificial}
+LANGUAGES = {Language.en}
 XMLNS = 'http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0'
 
 
@@ -42,8 +41,7 @@ def test_question_types_without_options(question_type):
         name = question_type,
         type = question_type,
         label = {
-            Language.english: question_type,
-            Language.artificial: question_type
+            Language.en: question_type
         }
     )
     expectation = Survey(
@@ -68,23 +66,20 @@ def test_question_types_with_options(question_type):
     option_1 = Option(
         name = 'option_1',
         label = {
-            Language.english: 'option 1',
-            Language.artificial: 'option 1',
+            Language.en: 'option 1',
         }
     )
     option_2 = Option(
         name = 'option_2',
         label = {
-            Language.english: 'option 2',
-            Language.artificial: 'option 2',
+            Language.en: 'option 2',
         }
     )
     question = Question(
         name = question_type,
         type = question_type,
         label = {
-            Language.english: question_type.replace('_', ' '),
-            Language.artificial: question_type.replace('_', ' ')
+            Language.en: question_type.replace('_', ' '),
         },
         options = [option_1, option_2]
     )
@@ -105,8 +100,7 @@ def test_question_required():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
         required = True
     )
@@ -127,16 +121,13 @@ def test_question_with_hint_help():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
         hint = {
-            Language.english: 'hint message',
-            Language.artificial: 'hint message'
+            Language.en: 'hint message',
         },
         help = {
-            Language.english: 'help message',
-            Language.artificial: 'help message'
+            Language.en: 'help message',
         }
     )
     expectation = Survey(
@@ -156,8 +147,7 @@ def test_question_with_comment():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
         comment = 'comment\nwith newline'
     )
@@ -178,13 +168,11 @@ def test_question_with_validation():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
         validation = Validation(
             message = {
-                Language.english: 'Your answer must start with "test".',
-                Language.artificial: 'Your answer must start with "test".'
+                Language.en: 'Your answer must start with "test".',
             },
             validation = "starts-with(., 'test')"
         )
@@ -206,16 +194,14 @@ def test_question_with_reference():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         }
     )
     question_with_reference = Question(
         name = 'label_with_reference',
         type = QuestionType.label,
         label = {
-            Language.english: 'text was: {}',
-            Language.artificial: 'text was: {}'
+            Language.en: 'text was: {}',
         },
         references = [referenced_question]
     )
@@ -235,23 +221,20 @@ def test_question_with_show_logic():
     option_1 = Option(
         name = 'option_1',
         label = {
-            Language.english: 'option 1',
-            Language.artificial: 'option 1',
+            Language.en: 'option 1',
         }
     )
     option_2 = Option(
         name = 'option_2',
         label = {
-            Language.english: 'option 2',
-            Language.artificial: 'option 2',
+            Language.en: 'option 2',
         }
     )
     referenced_question = Question(
         name = 'single_select',
         type = QuestionType.single_select,
         label = {
-            Language.english: 'single select',
-            Language.artificial: 'single select'
+            Language.en: 'single select',
         },
         options = [option_1, option_2]
     )
@@ -259,8 +242,7 @@ def test_question_with_show_logic():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
         show_logic = ShowLogic(
             # not mentioning option_1 as a `reference` below bc from_xml does not extract those as references.
@@ -304,23 +286,20 @@ def test_calculation_with_references():
     option_1 = Option(
         name = 'option_1',
         label = {
-            Language.english: 'option 1',
-            Language.artificial: 'option 1',
+            Language.en: 'option 1',
         }
     )
     option_2 = Option(
         name = 'option_2',
         label = {
-            Language.english: 'option 2',
-            Language.artificial: 'option 2',
+            Language.en: 'option 2',
         }
     )
     referenced_question = Question(
         name = 'single_select',
         type = QuestionType.single_select,
         label = {
-            Language.english: 'single select',
-            Language.artificial: 'single select'
+            Language.en: 'single select',
         },
         options = [option_1, option_2]
     )
@@ -352,15 +331,13 @@ def test_group():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
     )
     group = Group(
         name = 'group',
         label = {
-            Language.english: 'group',
-            Language.artificial: 'group'
+            Language.en: 'group',
         },
         contents = [question]
     )
@@ -381,23 +358,20 @@ def test_repeat_group():
         name = 'integer',
         type = QuestionType.integer,
         label = {
-            Language.english: 'integer',
-            Language.artificial: 'integer'
+            Language.en: 'integer',
         }
     )
     question_in_group = Question(
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text'
+            Language.en: 'text',
         },
     )
     group = Group(
         name = 'repeat_group',
         label = {
-            Language.english: 'repeat group',
-            Language.artificial: 'repeat group'
+            Language.en: 'repeat group',
         },
         repeat = integer_question,
         contents = [question_in_group]
@@ -423,16 +397,15 @@ def test_question_with_translation():
         name = 'text',
         type = QuestionType.text,
         label = {
-            Language.english: 'text',
-            Language.artificial: 'text',
-            Language.portuguese: 'translation'
+            Language.en: 'text',
+            Language.por: 'texto'
         },
     )
     expectation = Survey(
         title = 'Survey',
         xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial, Language.portuguese},
+        languages = {Language.en, Language.por},
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"

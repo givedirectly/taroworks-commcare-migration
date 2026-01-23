@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from simple_salesforce import Salesforce
 
-from migration.xforms.classes import Language
+from migration.xforms import Language
 
 from migration.migration import (
     query_tw_job,

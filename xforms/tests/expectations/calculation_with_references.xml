@@ -23,17 +23,6 @@
 						<value>option 2</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="single_select-label">
-						<value>single select</value>
-					</text>
-					<text id="single_select-option_1-label">
-						<value>option 1</value>
-					</text>
-					<text id="single_select-option_2-label">
-						<value>option 2</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

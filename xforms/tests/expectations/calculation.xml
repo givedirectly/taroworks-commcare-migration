@@ -11,7 +11,6 @@
 			<bind vellum:nodeset="#form/calculation" nodeset="/data/calculation" calculate="if(true(), 'value', 'other')" />
 			<itext>
 				<translation lang="en" default="" />
-				<translation lang="art" />
 			</itext>
 		</model>
 	</h:head>

@@ -26,17 +26,6 @@
 						<value>text</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="integer-label">
-						<value>integer</value>
-					</text>
-					<text id="repeat_group-label">
-						<value>repeat group</value>
-					</text>
-					<text id="repeat_group/text-label">
-						<value>text</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

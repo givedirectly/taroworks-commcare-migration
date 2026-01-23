@@ -5,9 +5,9 @@ The code in this folder allows us to define a survey in code as a `Survey` datac
 
 We can also build a `Survey` dataclass from an xform with
 
-```python3
+```python
 import xml.etree.ElementTree as ET
-from commcare.xforms import build_survey_from_xform
+from migration.xforms import build_survey_from_xform
 
 xform = ET.parse('xform.xml')
 survey = build_survey_from_xform(xform)
@@ -16,15 +16,16 @@ survey = build_survey_from_xform(xform)
 To define surveys from scratch in code, we can use the dataclasses for `Question`s, `Group`s, `Option`s, `ShowLogic`, `Calculation`s and `Validation`s:
 
 ```python
-from commcare.xforms.classes import *
+from migration.xforms import Languages
+from migration.xforms.classes import *
 
 # Integer question
 integer_question = Question(
 	name = 'num_repeats',
 	type = QuestionType.integer,
 	label = {
-		Language.english: 'How many repetitions?',
-		Language.artificial: '...'
+		Language.en: 'How many repetitions?',
+		Language.por: 'Quantas repetições?'
 	}
 )
 
@@ -32,23 +33,23 @@ integer_question = Question(
 option_1 = Option(
 	name = 'one',
 	label = {
-		Language.english: 'One',
-		Language.artificial: '1'
+		Language.en: 'One',
+		Language.por: 'Uma'
 	}
 )
 option_2 = Option(
 	name = 'two',
 	label = {
-		Language.english: 'Two',
-		Language.artificial: '2'
+		Language.en: 'Two',
+		Language.por: 'Duas'
 	}
 )
 multiple_choice_question = Question(
 	name = 'multiple_choice',
 	type = QuestionType.single_select,
 	label = {
-		Language.english: 'Select an option',
-		Language.artificial: '...'
+		Language.en: 'Select an option',
+		Language.por: 'Selecione uma opção'
 	},
 	options = [option_1, option_2]
 )
@@ -70,8 +71,8 @@ calculated_question = Question(
 repeat_group = Group(
 	name = 'repeat_group',
 	label = {
-		Language.english: 'Repeat group',
-		Language.artificial: '...'
+		Language.en: 'Repeat group',
+		Language.por: 'Grupo de repetição'
 	},
 	repeat = integer_question,
 	contents = [multiple_choice_question, calculated_question]
@@ -85,7 +86,7 @@ survey = Survey(
 		integer_question,
 		repeat_group,
 	],
-	languages = [Language.english, Language.artificial]
+	languages = [Language.en, Language.por]
 )
 
 print(survey.as_xml())
@@ -104,7 +105,7 @@ Consider this simple Commcare survey:
    1. A second question allows the user to select one of two options ("One" or "Two")
    2. A calculated question checks if the user answered "One"
 
-The xform for this survey looks like this:
+The xform for this survey (minus the translation) looks like this:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -143,6 +144,23 @@ The xform for this survey looks like this:
 						<value>Two</value>
 					</text>
 				</translation>
+				<translation lang="por" default="">
+					<text id="num_repeat-label">
+						<value>Quantas repetições?</value>
+					</text>
+					<text id="repeat_group-label">
+						<value>Grupo de repetição</value>
+					</text>
+					<text id="repeat_group/select_an_option-label">
+						<value>Selecione uma opção</value>
+					</text>
+					<text id="repeat_group/select_an_option-one-label">
+						<value>Uma</value>
+					</text>
+					<text id="repeat_group/select_an_option-two-label">
+						<value>Duas</value>
+					</text>
+				</translation>
 			</itext>
 		</model>
 	</h:head>
@@ -176,7 +194,7 @@ Broken down, there are four main sections:
 2. Head > Model > Bind
    - Each group or question has one `bind` tag that contains metadata such as requiredness, calculations, validations, show logic, etc.
 3. Head > Model > iText
-   - Multiple `text` tags, each containing the full text of some aspect of the survey
+   - Multiple `text` tags, each containing the full text of some aspect of the survey in each of the languages used
    - These can be: group/question/option labels, question help/hint text or question validtaion messages
 4. Body
    - Each question gets a new tag in the `body` section containing references to the `itext` tags mentioned above and some more metadata

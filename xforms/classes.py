@@ -7,6 +7,8 @@ from typing import Optional, Union
 from migration.xforms.helpers import element
 import xml.etree.ElementTree as ET
 
+from migration.xforms.languages import Language
+
 
 class QuestionType(StrEnum):
     single_select = 'single_select'
@@ -22,14 +24,6 @@ class QuestionType(StrEnum):
     calculation = 'calculation'
     gps = 'gps'
     barcode = 'barcode'
-
-class Language(StrEnum):
-    english = 'en'
-    artificial = 'art'
-    portuguese = 'por'
-    arabic = 'ara'
-    kinyarwanda = 'kin'
-    french = 'fra'
 
 
 @dataclass

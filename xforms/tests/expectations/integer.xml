@@ -15,11 +15,6 @@
 						<value>integer</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="integer-label">
-						<value>integer</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

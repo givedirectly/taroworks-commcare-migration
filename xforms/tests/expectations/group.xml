@@ -21,14 +21,6 @@
 						<value>text</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="group-label">
-						<value>group</value>
-					</text>
-					<text id="group/text-label">
-						<value>text</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

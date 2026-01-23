@@ -205,7 +205,7 @@ def _comparison_with_picklist(question: str, operator: str, value_node: Node, qu
             other_question_name = question_name_match.group(1)
             other_question = _get_question_by_name(other_question_name, questions)
 
-        language = next(lang for lang in other_question.label if lang != Language.artificial)
+        language = next(lang for lang in other_question.label)
         for option in other_question.options:
             if option.label[language] == value_node.value:
                 if other_question.type == QuestionType.multi_select:

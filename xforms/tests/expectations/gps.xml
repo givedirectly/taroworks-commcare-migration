@@ -15,11 +15,6 @@
 						<value>gps</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="gps-label">
-						<value>gps</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

@@ -15,11 +15,6 @@
 						<value>decimal</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="decimal-label">
-						<value>decimal</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

@@ -15,11 +15,6 @@
 						<value>date</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="date-label">
-						<value>date</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

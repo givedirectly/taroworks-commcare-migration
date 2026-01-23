@@ -21,17 +21,6 @@
 						<value>help message</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="text-label">
-						<value>text</value>
-					</text>
-					<text id="text-hint">
-						<value>hint message</value>
-					</text>
-					<text id="text-help">
-						<value>help message</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

@@ -299,12 +299,12 @@ def test_validation_single_select_picklist():
         Question(
             name = 'question',
             type = QuestionType.single_select,
-            label = {Language.english: 'Single-select picklist question'},
+            label = {Language.en: 'Single-select picklist question'},
             options = [
                 Option(
                     name = 'true',
                     label = {
-                        Language.english: 'True'
+                        Language.en: 'True'
                     }
                 )
             ]
@@ -324,12 +324,12 @@ def test_validation_multi_select_picklist():
         Question(
             name = 'question',
             type = QuestionType.multi_select,
-            label = {Language.english: 'Multi-select picklist question'},
+            label = {Language.en: 'Multi-select picklist question'},
             options = [
                 Option(
                     name = 'true',
                     label = {
-                        Language.english: 'True'
+                        Language.en: 'True'
                     }
                 )
             ]
@@ -396,18 +396,17 @@ def test_comparison_with_single_select_picklist(formula, expectation):
         Question(
             name = 'text_question',
             type = QuestionType.text,
-            label = {Language.english: 'Text question'}
+            label = {Language.en: 'Text question'}
         ),
         Question(
             name = 'single_select_picklist_question',
             type = QuestionType.single_select,
-            label = {Language.english: 'Single-select picklist question'},
+            label = {Language.en: 'Single-select picklist question'},
             options = [
                 Option(
                     name = 'option_value',
                     label = {
-                        Language.english: 'Option value',
-                        Language.artificial: 'art option value'
+                        Language.en: 'Option value',
                     }
                 )
             ]
@@ -439,18 +438,17 @@ def test_comparison_with_multi_select_picklist(formula, expectation):
         Question(
             name = 'text_question',
             type = QuestionType.text,
-            label = {Language.english: 'Text question'}
+            label = {Language.en: 'Text question'}
         ),
         Question(
             name = 'multi_select_picklist_question',
             type = QuestionType.multi_select,
-            label = {Language.english: 'Multi-select picklist question'},
+            label = {Language.en: 'Multi-select picklist question'},
             options = [
                 Option(
                     name = 'option_value',
                     label = {
-                        Language.english: 'Option value',
-                        Language.artificial: 'art option value'
+                        Language.en: 'Option value',
                     }
                 )
             ]
@@ -482,7 +480,7 @@ def test_addition_of_strings(formula, expectation):
         Question(
             name = 'text_question',
             type = QuestionType.text,
-            label = {Language.english: 'Text question'}
+            label = {Language.en: 'Text question'}
         )
     ]
     actual = translate_calculation(formula, question_name = "question", other_questions = other_questions)

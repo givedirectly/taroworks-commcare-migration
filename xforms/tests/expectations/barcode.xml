@@ -15,11 +15,6 @@
 						<value>barcode</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="barcode-label">
-						<value>barcode</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

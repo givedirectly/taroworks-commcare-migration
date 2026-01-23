@@ -20,14 +20,6 @@
 						<value>text was: <output value="/data/text" vellum:value="#form/text" /></value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="text-label">
-						<value>text</value>
-					</text>
-					<text id="label_with_reference-label">
-						<value>text was: <output value="/data/text" vellum:value="#form/text" /></value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>

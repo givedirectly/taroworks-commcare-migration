@@ -15,11 +15,6 @@
 						<value>photo</value>
 					</text>
 				</translation>
-				<translation lang="art">
-					<text id="photo-label">
-						<value>photo</value>
-					</text>
-				</translation>
 			</itext>
 		</model>
 	</h:head>
