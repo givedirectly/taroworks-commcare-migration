@@ -35,8 +35,10 @@ TW_QUESTION_TYPES = {
 
 def migrate_survey(tw_form: dict, pulldown_mappings: dict[str, str], survey_name: str, survey_xmlns: str, survey_language: Language) -> Survey:
 
-    groups_by_index = {}
-    groups_by_id, questions_by_id, options_by_id = {}, {}, {}
+    groups_by_index: dict[int, Group] = {}
+    groups_by_id: dict[str, Group] = {}
+    questions_by_id: dict[str, Question] = {}
+    options_by_id: dict[str, Option] = {}
 
     records_in_order = sorted(tw_form, key = lambda r: _clean_section_question(r['Section_Question__c']))
 
@@ -100,16 +102,10 @@ def migrate_survey(tw_form: dict, pulldown_mappings: dict[str, str], survey_name
                 groups_by_index[group_index].contents.append(label_question)
     
     # Set up survey
-    root_group = Group(
-        name = 'survey',
-        label = {survey_language: 'Survey'},
-        contents = list(groups_by_id.values()),
-    )
-
     survey = Survey(
         title = survey_name,
         xmlns = survey_xmlns,
-        contents = [root_group],
+        contents = list(groups_by_id.values()),
         languages = [survey_language],
         version = None
     )
