@@ -1,4 +1,4 @@
-import json, os, pickle, re
+import os, re
 from dotenv import load_dotenv
 from simple_salesforce import Salesforce
 
@@ -12,36 +12,11 @@ from migration.migration import (
 )
 
 
-MASTER_DIRNAME = '/Users/gavarela/Google Drive/Meu Drive/GD Downloads/reusable_library/migration'
+MASTER_DIRNAME = 'dirname'
 
 TW_JOBS = {
-    '2.0 Bangladesh Google AA Follow Up [Recipient]': Language.english,
-    '4.0 DRC PoN FLUP [Recipient]': Language.french,
-    '1.0 DRC BHA MobileAid FLUP [Recipient]': Language.french,
-    '1.0 DRC BHA Research [Recipient]': Language.french,
-    '2.0 Kenya Standard Remote Audit [County]': Language.english,
-    '2.0 KE UBI Follow-up [Recipient]': Language.english,
-    '2.0 KE UBI Retail Followup [Recipient]': Language.english,
-    '1.1 Liberia REALISE MOG 3 Followup [Recipient]': Language.english,
-    '1.0 Liberia STYLI Followup [Recipient]': Language.english,
-    '1.5 Liberia STYL Registration [Recipient]': Language.english,
-    '1.0 Malawi SAVE PON In-Person Registration [Traditional Authority]': Language.english,
-    '2.0 Malawi PON FLUP [Recipient]': Language.english,
-    '3.5 Malawi Cash4Health MSF II Registration [Recipient]': Language.english,
-    '2.2 Malawi Cash4Health MSF II Follow-up [Recipient]': Language.english,
-    '3.0 Malawi STEP Flex/FCDO At Home Revisit [District]': Language.english,
-    '2.0 Malawi STEP Flex Large Transfer New ID Capture [Village]': Language.english,
-    '1.4 Malawi STEP Flex SIM Registration [GVH]': Language.english,
-    '1.0 Malawi STEP FLEX /FCDO M&E Midline [TA]': Language.english,
-    '1.0 Malawi STEP FLEX /FCDO Monitoring and Evaluation [TA]': Language.english,
-    '2.8 Malawi STEP Large Transfer Follow-up [TA]': Language.english,
-    '4.0 Moz CSA FLUP [Recipient]': Language.portuguese,
-    '1.6 Rwanda STEP Large Transfer FLUP[Recipient]': Language.kinyarwanda,
-    '3.0 Rwanda STEP MnE [District]': Language.kinyarwanda,
-    '5.1 Rwanda STEP Large Transfer At Home[District]': Language.kinyarwanda,
-    '2.0 RW STEP Registration [District]': Language.kinyarwanda,
-    '1.0 Uganda Kiryandongo New Arrivals Flup [Recipient]': Language.english,
-    '1.3 Uganda Kiryandongo New Arrivals Phone Distribution [Recipient]': Language.english,
+    'tw_job_name': Language.language_code,
+    ...: ...,
 }
 
 
@@ -61,19 +36,9 @@ def main(
     form_name = tw_job['gfsurveys__Form__r']['gfsurveys__Survey__r']['Name']
     form_version = tw_job['gfsurveys__Form__r']['gfsurveys__Version__c']
 
-    print(f'Migrating form {form_name}, version {int(form_version)}.')
-
     pulldown_mappings = get_pulldown_mappings(tw_job)
     
-    try:
-        with open(f'{dirname}/tw_form.json', 'r') as file:
-            tw_form = json.load(file)
-    except FileNotFoundError:
-        tw_form = query_tw_form(salesforce, form_name, form_version)
-        with open(f'{dirname}/tw_form.json', 'w') as file:
-            json.dump(tw_form, file, indent = 4)
-
-    print('Converting TW form into xform.')
+    tw_form = query_tw_form(salesforce, form_name, form_version)
 
     migrated_survey = migrate_survey(
         tw_form, 
@@ -83,19 +48,12 @@ def main(
         survey_language,
     )
 
-    with open(f'{dirname}/survey_class.pkl', 'wb') as file:
-        pickle.dump(migrated_survey, file)
-
     with open(f'{dirname}/migrated_survey.xml', 'w') as file:
         file.write(migrated_survey.as_xml())
 
     case_properties = [field.replace('.', '__') for field in pulldown_mappings.values()]
     with open(f'{dirname}/case_properties.txt', 'w') as file:
         file.write('\n'.join(case_properties))
-
-    print('All done')
-
-    return case_properties
 
 
 if __name__ == "__main__":
@@ -119,7 +77,7 @@ if __name__ == "__main__":
             consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY')
         ) # reload sf for each job in case connection times out
 
-        case_properties = main(
+        main(
             salesforce, 
             job_name, 
             language,
