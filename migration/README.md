@@ -28,16 +28,8 @@ The queries in `queries.py` pull all relevant data from taroworks jobs and forms
 
 With this data, we can re-define the taroworks survey as a `Survey` containing `Group`s and `Question`s from `xml_forms/utils.py` and use that to save the survey as an XML file.
 
-Most of the question metadata can be directly 'translated' to the commcare format (e.g. type, label, etc.). The main nuances are:
-1. Translating non-English answer options
-2. Translating formulas
-3. Migrating non-hidden calculated questions
+Most of the question metadata can be directly 'translated' to the commcare format (e.g. type, label, etc.). The main nuances are translating formulas (calculations, validations and show logic) and migrating non-hidden calculated questions (possible in TW but not in CC).
 
-### Translating non-English answer options
-
-With non-English TW forms, the answers are submitted to Salesforce in the non-English language. We then set translations for all picklist options in Salesforce itself and Salesforce performs this translation when it receives the non-English answer.
-
-In this script, I check the Salesforce translations for picklist options to set the `art` translation for picklist options to the English question value, which will successfully map to the Salesforce field.
 
 ### Translating formulas
 
@@ -57,6 +49,7 @@ Some formulas I know will be translated incorrectly are:
   - The translated formula will noisily fail once the XML is uploaded to CC (and be easy to fix there)
 - Formulas that reference themselves
   - The translated formula will noisily fail once the XML is uploaded to CC (and be easy to fix there)
+
 
 ### Translating non-hidden calculated questions
 
