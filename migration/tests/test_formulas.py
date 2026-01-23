@@ -1,13 +1,13 @@
 import pytest
 from html import escape
 
-from commcare.xforms.classes import (
+from migration.xforms.classes import (
     Language,
     Option, 
     Question, 
     QuestionType
 )
-from commcare.migration.surveys.formulas import (
+from migration.migration.formulas import (
     CalcIsValError,
     translate_calculation, 
     translate_validation

@@ -1,7 +1,7 @@
 import re
 from xml.etree.ElementTree import Element
 
-from commcare.xforms.classes import *
+from migration.xforms.classes import *
 
 
 ## Constants (do not touch!) ----

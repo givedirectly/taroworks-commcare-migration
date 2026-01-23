@@ -2,8 +2,8 @@ import json
 
 from urllib.parse import unquote
 
-from commcare.xforms.classes import *
-from commcare.migration.surveys.formulas import (
+from migration.xforms.classes import *
+from migration.migration.formulas import (
     translate_calculation,
     translate_validation,
     CalcIsValError

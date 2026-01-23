@@ -4,7 +4,7 @@ from enum import StrEnum
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from commcare.xforms.helpers import element
+from migration.xforms.helpers import element
 import xml.etree.ElementTree as ET
 
 

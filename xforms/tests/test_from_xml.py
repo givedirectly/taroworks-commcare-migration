@@ -1,7 +1,7 @@
 import pytest
 import xml.etree.ElementTree as ET
 
-from commcare.xforms.classes import (
+from migration.xforms.classes import (
     Calculation,
     Group,
     Language,
@@ -14,10 +14,11 @@ from commcare.xforms.classes import (
     Validation
 )
 
-from commcare.xforms import build_survey_from_xform
+from migration.xforms import build_survey_from_xform
 
-languages = [Language.english, Language.artificial]
-xmlns = 'http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0'
+EXPECTATIONS_DIR = 'migration/xforms/tests/expectations/'
+LANGUAGES = {Language.english, Language.artificial}
+XMLNS = 'http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0'
 
 
 @pytest.mark.parametrize(
@@ -35,8 +36,8 @@ xmlns = 'http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0'
         QuestionType.barcode
     ])
 def test_question_types_without_options(question_type):
-    xml = ET.parse(f'commcare/xforms/tests/expectations/{question_type}.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/{question_type}.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = question_type,
         type = question_type,
@@ -47,9 +48,9 @@ def test_question_types_without_options(question_type):
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
@@ -62,8 +63,8 @@ def test_question_types_without_options(question_type):
         QuestionType.multi_select,
     ])
 def test_question_types_with_options(question_type):
-    xml = ET.parse(f'commcare/xforms/tests/expectations/{question_type}.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/{question_type}.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     option_1 = Option(
         name = 'option_1',
         label = {
@@ -89,17 +90,17 @@ def test_question_types_with_options(question_type):
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_required():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_required.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_required.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -111,17 +112,17 @@ def test_question_required():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_hint_help():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_hint_help.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_hint_help.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -140,17 +141,17 @@ def test_question_with_hint_help():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_comment():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_comment.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_comment.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -162,17 +163,17 @@ def test_question_with_comment():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_validation():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_validation.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_validation.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -190,17 +191,17 @@ def test_question_with_validation():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_reference():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_reference.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_reference.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     referenced_question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -220,17 +221,17 @@ def test_question_with_reference():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [referenced_question, question_with_reference]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_show_logic():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_show_logic.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_show_logic.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     option_1 = Option(
         name = 'option_1',
         label = {
@@ -271,17 +272,17 @@ def test_question_with_show_logic():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [referenced_question, question_with_show_logic]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_calculation():
-    xml = ET.parse('commcare/xforms/tests/expectations/calculation.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/calculation.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'calculation',
         type = QuestionType.calculation,
@@ -289,17 +290,17 @@ def test_calculation():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [question]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_calculation_with_references():
-    xml = ET.parse('commcare/xforms/tests/expectations/calculation_with_references.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/calculation_with_references.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     option_1 = Option(
         name = 'option_1',
         label = {
@@ -336,17 +337,17 @@ def test_calculation_with_references():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [referenced_question, calculation_with_references]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_group():
-    xml = ET.parse('commcare/xforms/tests/expectations/group.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/group.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     question = Question(
         name = 'text',
         type = QuestionType.text,
@@ -365,17 +366,17 @@ def test_group():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [group]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_repeat_group():
-    xml = ET.parse('commcare/xforms/tests/expectations/repeat_group.xml').getroot()
-    actual = build_survey_from_xform(xml, xmlns = xmlns, version = 1)
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/repeat_group.xml').getroot()
+    actual = build_survey_from_xform(xml, xmlns = XMLNS, version = 1)
     integer_question = Question(
         name = 'integer',
         type = QuestionType.integer,
@@ -403,19 +404,19 @@ def test_repeat_group():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
-        languages = {Language.english, Language.artificial},
+        languages = LANGUAGES,
         contents = [integer_question, group]
     )
     assert actual == expectation, f"xml mismatch\nactual:\n{actual}\nvs.\nexpectation:\n{expectation}"
 
 
 def test_question_with_translation():
-    xml = ET.parse('commcare/xforms/tests/expectations/question_with_translation.xml').getroot()
+    xml = ET.parse(f'{EXPECTATIONS_DIR}/question_with_translation.xml').getroot()
     actual = build_survey_from_xform(
         xml,
-        xmlns = xmlns, 
+        xmlns = XMLNS, 
         version = 1
     )
     question = Question(
@@ -429,7 +430,7 @@ def test_question_with_translation():
     )
     expectation = Survey(
         title = 'Survey',
-        xmlns = xmlns,
+        xmlns = XMLNS,
         version = 1,
         languages = {Language.english, Language.artificial, Language.portuguese},
         contents = [question]

@@ -4,9 +4,9 @@ from simple_salesforce import Salesforce
 
 from gddata import get_picklist_translations 
 
-from commcare.xforms.classes import Language
+from migration.xforms.classes import Language
 
-from commcare.migration.surveys import (
+from migration.migration import (
     query_tw_job,
     query_tw_form, 
     get_pulldown_mappings,

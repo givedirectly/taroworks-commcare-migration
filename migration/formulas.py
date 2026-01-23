@@ -1,7 +1,7 @@
 import esprima, re
 from html import unescape
 
-from commcare.xforms.classes import Language, QuestionType
+from migration.xforms.classes import Language, QuestionType
 
 
 ## Calculations ----
