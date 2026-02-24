@@ -3,7 +3,7 @@ import json
 from urllib.parse import unquote
 
 from migration.xforms.classes import *
-from migration.migration.formulas import (
+from migration.formulas import (
     translate_calculation,
     translate_validation,
     CalcIsValError

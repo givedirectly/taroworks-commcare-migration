@@ -53,10 +53,10 @@ dependencies:
 
 You can run this from the command-line of your terminal like:
 
-```bash
-> cd path/to/folder/where/migrations/is
-> python3 migration/main.py --tw_job "Your TW Job Name" \
-    --survey_language "en" \
+```
+> cd path/to/folder/containing/migration/
+> python migration/main.py --tw_job "Your TW Job Name" \
+    --survey_language "english" \
     --directory "path/to/save/outputs"
 ```
 

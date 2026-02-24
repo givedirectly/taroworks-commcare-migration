@@ -5,11 +5,13 @@ from simple_salesforce import Salesforce
 
 from migration.xforms import Language
 
-from migration.migration import (
-    query_tw_job,
-    query_tw_form, 
+from migration.surveys import (
     get_pulldown_mappings,
     migrate_survey
+)
+from migration.queries import (
+    query_tw_form,
+    query_tw_job
 )
 
 
@@ -66,16 +68,18 @@ if __name__ == "__main__":
     load_dotenv()
 
     salesforce = Salesforce(
-        username = os.getenv('SALESFORCE_USERNAME'),
+        username = os.getenv('SALESFORCE_USERNAME') + ".dev",
         privatekey_file = os.getenv('SALESFORCE_PRIVATEKEY_FILE'),
         consumer_key = os.getenv('SALESFORCE_CONSUMER_KEY'),
+        domain = "test"
     )
 
-    os.makedirs(args.directory)
+    if args.directory != ".":
+        os.makedirs(args.directory)
 
     main(
         salesforce,
-        args.job_name,
-        args.language,
-        dirname = args.dirname
+        args.tw_job,
+        args.survey_language,
+        dirname = args.directory
     )
