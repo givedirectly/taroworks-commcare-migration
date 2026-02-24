@@ -56,9 +56,11 @@ You can run this from the command-line of your terminal like:
 ```
 > cd path/to/folder/containing/migration/
 > python migration/main.py --tw_job "Your TW Job Name" \
-    --survey_language "english" \
+    --survey_language "en" \
     --directory "path/to/save/outputs"
 ```
+
+Note that the `--survey-language` argument should match one of the language **codes** from `migration/xforms/languages.py`. So it should be "en" instead of "english", for example.
 
 
 ## How do I generate a Commcare survey from this code?

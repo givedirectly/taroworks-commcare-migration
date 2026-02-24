@@ -174,7 +174,7 @@ def _comparison_with_null(object: str, operator: str) -> str:
 
 def _is_comparison_with_picklist(potential_question: str, potential_option_node: str, question_name: str, questions: list[Question]) -> bool:
 
-    question_name_match = re.match(r'#form/survey/\w+/(\w+)$', potential_question)
+    question_name_match = re.match(r'#form/\w+/(\w+)$', potential_question)
     if not question_name_match and potential_question != ".":
         return False
     
@@ -201,7 +201,7 @@ def _comparison_with_picklist(question: str, operator: str, value_node: Node, qu
             other_question = _get_question_by_name(question_name, questions)
             print(other_question)
         else:
-            question_name_match = re.match(r'#form/survey/\w+/(\w+)$', question)
+            question_name_match = re.match(r'#form/\w+/(\w+)$', question)
             other_question_name = question_name_match.group(1)
             other_question = _get_question_by_name(other_question_name, questions)
 
@@ -222,7 +222,7 @@ def _comparison_with_picklist(question: str, operator: str, value_node: Node, qu
 def _is_string(object: str, questions: list[Question]) -> bool:
     if re.match(r"^'.+'$", object) or re.match(r'^".+"$', object):
         return True
-    question_name_match = re.match(r'#form/survey/\w+/(\w+)$', object)
+    question_name_match = re.match(r'#form/\w+/(\w+)$', object)
     if question_name_match:
         other_question_name = question_name_match.group(1)
         other_question = _get_question_by_name(other_question_name, questions)
@@ -357,9 +357,9 @@ def _translate_member_expression(node: Node, question_name: str, questions: list
     translated_property = _translate_node(node.property, question_name, questions)
     
     if translated_object == "tw":
-        return f"#form/survey/{translated_property}"
+        return f"#form/{translated_property}"
     
-    section_match = re.match(r"#form/survey/\w+$", translated_object)
+    section_match = re.match(r"#form/\w+$", translated_object)
     if section_match:
 
         if translated_property == "current":
@@ -367,7 +367,7 @@ def _translate_member_expression(node: Node, question_name: str, questions: list
         
         return f"{translated_object}/{translated_property}"
     
-    question_match = re.match(r"#form/survey/\w+/(\w+)$", translated_object)
+    question_match = re.match(r"#form/\w+/(\w+)$", translated_object)
     if question_match:
 
         if translated_property in ("value", "hasAnswer"):
@@ -381,7 +381,7 @@ def _translate_member_expression(node: Node, question_name: str, questions: list
             return translated_object
         
         if translated_property == "length":
-            if re.match(r"#form/survey/\w+/\w+$", translated_object):
+            if re.match(r"#form/\w+/\w+$", translated_object):
                 return f"string-length({translated_object})"
 
     raise NotImplementedError()

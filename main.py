@@ -60,7 +60,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument("--tw_job")
-    parser.add_argument("--survey_language", default="english")
+    parser.add_argument("--survey_language", default="en")
     parser.add_argument("--directory", default=".")
     
     args = parser.parse_args()
