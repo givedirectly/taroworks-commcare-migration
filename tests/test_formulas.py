@@ -7,7 +7,7 @@ from migration.xforms.classes import (
     Question, 
     QuestionType
 )
-from migration.migration.formulas import (
+from migration.formulas import (
     CalcIsValError,
     translate_calculation, 
     translate_validation

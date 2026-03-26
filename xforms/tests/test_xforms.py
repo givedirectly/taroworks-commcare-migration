@@ -1,4 +1,5 @@
 import pytest, re
+from pathlib import Path
 from xml.dom import minidom
 
 from migration.xforms import Language
@@ -13,7 +14,7 @@ from migration.xforms.classes import (
     Validation
 )
 
-EXPECTATIONS_DIR = 'migration/xforms/tests/expectations/'
+EXPECTATIONS_DIR = str(Path(__file__).parent / 'expectations')
 LANGUAGES = {Language.en}
 XMLNS = 'http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0'
 
