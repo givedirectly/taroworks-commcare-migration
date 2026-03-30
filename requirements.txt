@@ -1,0 +1,6 @@
+esprima
+python-dotenv
+simple-salesforce
+
+# Dev
+pytest

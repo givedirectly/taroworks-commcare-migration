@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:orx="http://openrosa.org/jr/xforms" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:vellum="http://commcarehq.org/xforms/vellum">
+	<h:head>
+		<h:title>Survey</h:title>
+		<model>
+			<instance>
+				<data xmlns:jrm="http://dev.commcarehq.org/jr/xforms" xmlns="http://openrosa.org/formdesigner/3B5D2FA0-D3BE-4DFC-A2F4-87DE19E788D0" uiVersion="1" version="1" name="Survey">
+					<photo />
+				</data>
+			</instance>
+			<bind vellum:nodeset="#form/photo" nodeset="/data/photo" type="binary" />
+			<itext>
+				<translation lang="en" default="">
+					<text id="photo-label">
+						<value>photo</value>
+					</text>
+				</translation>
+			</itext>
+		</model>
+	</h:head>
+	<h:body>
+		<upload mediatype="image/*" jr:imageDimensionScaledMax="1000px" vellum:ref="#form/photo" ref="/data/photo" appearance="acquire">
+			<label ref="jr:itext('photo-label')" />
+		</upload>
+	</h:body>
+</h:html>
